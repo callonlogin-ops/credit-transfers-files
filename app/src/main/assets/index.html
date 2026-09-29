@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Credit Transfers Files</title>
+    <style>
+        :root {
+            --bg: #101827;
+            --panel: #162233;
+            --panel-strong: #1d2d44;
+            --primary: #3888ff;
+            --accent: #31d0aa;
+            --text: #f5f7fb;
+            --muted: #aab8cf;
+            --danger: #ff5c5c;
+            --success: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0b1220 0%, #17263f 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: min(900px, 100%);
+            background: rgba(20, 31, 48, 0.9);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 24px 28px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: clamp(1.5rem, 2vw, 2.5rem);
+        }
+
+        .panel {
+            padding: 28px;
+        }
+
+        .login-box, .upload-box {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .login-box h2, .upload-box h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="file"],
+        button {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--panel-strong);
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), #5d8dff);
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .secondary {
+            background: linear-gradient(135deg, var(--accent), #4ad4ff);
+        }
+
+        .danger {
+            background: linear-gradient(135deg, var(--danger), #ff7c75);
+        }
+
+        .upload-box .dropzone {
+            width: 100%;
+            min-height: 120px;
+            border: 2px dashed rgba(255,255,255,0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--muted);
+            border-radius: 12px;
+            margin-top: 14px;
+            padding: 12px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .list {
+            margin-top: 18px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .file-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .status {
+            margin-top: 18px;
+            min-height: 24px;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        @media (max-width: 640px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Credit Transfers Files</h1>
+        </div>
+
+        <div class="panel">
+            <div class="login-box">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="row">
+                        <div>
+                            <label for="email">E-mail</label>
+                            <input id="email" type="email" placeholder="usuario@exemplo.com" required />
+                        </div>
+                        <div>
+                            <label for="password">Senha</label>
+                            <input id="password" type="password" placeholder="••••••••" required />
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <button type="submit">Entrar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="upload-box">
+                <h2>Transferência de arquivos</h2>
+                <input id="fileInput" type="file" multiple />
+                <div class="dropzone" id="dropzone">Arraste arquivos aqui ou clique para selecionar.</div>
+                <div style="display: flex; gap: 12px; margin-top: 18px;">
+                    <button class="secondary" id="downloadBtn" type="button">Baixar selecionados</button>
+                    <button class="danger" id="clearBtn" type="button">Limpar lista</button>
+                </div>
+                <div id="fileList" class="list"></div>
+                <div id="status" class="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const statusBox = document.getElementById('status');
+        const dropzone = document.getElementById('dropzone');
+        const loginForm = document.getElementById('loginForm');
+
+        const uploadedFiles = [];
+
+        function renderFiles() {
+            fileList.innerHTML = '';
+
+            if (uploadedFiles.length === 0) {
+                fileList.innerHTML = '<div class="file-item"><div class="file-name">Nenhum arquivo enviado.</div></div>';
+                return;
+            }
+
+            uploadedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `
+                    <div>
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${(file.size / 1024).toFixed(1)} KB</div>
+                    </div>
+                    <button type="button" data-index="${index}" class="downloadSingle">Download</button>
+                `;
+                fileList.appendChild(item);
+            });
+
+            document.querySelectorAll('.downloadSingle').forEach(button => {
+                button.addEventListener('click', () => {
+                    const idx = Number(button.dataset.index);
+                    downloadFile(uploadedFiles[idx]);
+                });
+            });
+        }
+
+        function updateStatus(message, isSuccess = true) {
+            statusBox.textContent = message;
+            statusBox.style.color = isSuccess ? '#2ecc71' : '#ff5c5c';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function addFiles(fileCollection) {
+            const items = Array.from(fileCollection || []);
+            items.forEach(file => {
+                uploadedFiles.push(file);
+            });
+            renderFiles();
+            updateStatus(`${items.length} arquivo(s) adicionado(s) com sucesso.`);
+        }
+
+        function downloadFile(file) {
+            const blob = new Blob([file], { type: file.type || 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = file.name;
+            link.click();
+            URL.revokeObjectURL(url);
+            updateStatus(`Download iniciado: ${file.name}`);
+        }
+
+        fileInput.addEventListener('change', (event) => {
+            addFiles(event.target.files);
+            fileInput.value = '';
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dropzone.style.borderColor = 'rgba(49,208,170,0.8)';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dropzone.style.borderColor = 'rgba(255,255,255,0.16)';
+            });
+        });
+
+        dropzone.addEventListener('drop', (event) => {
+            const files = event.dataTransfer.files;
+            addFiles(files);
+        });
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!email || !password) {
+                updateStatus('Preencha o e-mail e a senha.', false);
+                return;
+            }
+
+            updateStatus(`Login realizado com sucesso para ${email}.`);
+            localStorage.setItem('creditTransfersUser', email);
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (uploadedFiles.length === 0) {
+                updateStatus('Nenhum arquivo disponível para download.', false);
+                return;
+            }
+
+            uploadedFiles.forEach(file => downloadFile(file));
+            updateStatus(`${uploadedFiles.length} arquivo(s) transferidos.`);
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            uploadedFiles.length = 0;
+            renderFiles();
+            updateStatus('Lista limpa com sucesso.');
+        });
+
+        renderFiles();
+    </script>
+</body>
+</html>

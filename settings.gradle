@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CreditTransfersFiles"
+rootProject.name = "credit-transfers-files"
 include(":app")
